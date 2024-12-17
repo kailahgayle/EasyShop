@@ -25,9 +25,9 @@ public class CategoriesController
     private ProductDao productDao;
 
 @Autowired
-public CategoriesController (CategoryDao categorydao, ProductDao productdao){
-    this.categoryDao = categorydao;
-    this.productDao = productdao;
+    public CategoriesController (CategoryDao categorydao, ProductDao productdao){
+         this.categoryDao = categorydao;
+         this.productDao = productdao;
 }
     // add the appropriate annotation for a get action
 @GetMapping ("")
