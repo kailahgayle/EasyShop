@@ -4,6 +4,8 @@ package org.yearup.data.mysql;
 
 import org.springframework.stereotype.Component;
 
+import org.yearup.models.Category;
+
 import org.yearup.models.Profile;
 
 import org.yearup.data.ProfileDao;
@@ -13,6 +15,10 @@ import org.yearup.data.ProfileDao;
 import javax.sql.DataSource;
 
 import java.sql.*;
+
+import java.util.ArrayList;
+
+import java.util.List;
 
 
 
@@ -44,7 +50,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 
 
 
-        try (Connection connection = getConnection())
+        try(Connection connection = getConnection())
 
         {
 
@@ -72,8 +78,6 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 
             ps.executeUpdate();
 
-
-
             return profile;
 
         }
@@ -90,51 +94,115 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 
 
 
-    // Updates for user profile: Added method to retrieve a profile by user ID
-
     @Override
 
-    public Profile getByUserId(int userId)
-
-    {
-
-        String sql = "SELECT * FROM profiles WHERE user_id = ?";
+    public Profile getByUserId(int userId){
 
 
 
-        try (Connection connection = getConnection())
+        String sql = """
 
-        {
+            SELECT *
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+            FROM profiles
 
-            ps.setInt(1, userId);
+            WHERE user_id = ?;
+
+            """;
 
 
 
-            ResultSet rs = ps.executeQuery();
+        try (Connection connection = getConnection();
 
-            if (rs.next())
+             PreparedStatement query = connection.prepareStatement(sql)) {
 
-            {
 
-                return mapRow(rs);
+
+            query.setInt(1, userId);
+
+
+
+            try (ResultSet results = query.executeQuery()) {
+
+                if (results.next()) {
+
+                    return mapRow(results); //Use the mapRow method here
+
+                }
 
             }
 
-            else
+        } catch (SQLException e) {
 
-            {
+            e.printStackTrace();
 
-                return null;
-
-            }
+            throw new RuntimeException(e);
 
         }
 
-        catch (SQLException e)
+        return null;
+
+    }
+
+
+
+
+
+    @Override
+
+    public Profile update(Profile profile)
+
+    {
+
+        // update category
+
+        String sql = """
+
+                UPDATE profiles
+
+                SET first_name = ?, last_name = ?, phone = ?, email = ?, address = ?, city = ?, state = ?, zip = ?
+
+                WHERE user_id = ?;
+
+                """;
+
+        try(Connection connection = getConnection();
+
+            PreparedStatement query = connection.prepareStatement(sql);
+
+        )
 
         {
+
+            query.setString(1, profile.getFirstName());
+
+            query.setString(2, profile.getLastName());
+
+            query.setString(3, profile.getPhone());
+
+            query.setString(4, profile.getEmail());
+
+            query.setString(5, profile.getAddress());
+
+            query.setString(6, profile.getCity());
+
+            query.setString(7, profile.getState());
+
+            query.setString(8, profile.getZip());
+
+
+
+            query.setInt(9, profile.getUserId());
+
+
+
+            query.executeUpdate();
+
+
+
+            return profile;
+
+        } catch (SQLException e) {
 
             throw new RuntimeException(e);
 
@@ -144,87 +212,57 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 
 
 
-    // Updates for user profile: Added the method to update a profile
 
-    @Override
 
-    public void update(Profile profile)
+    private Profile mapRow(ResultSet row) throws SQLException
 
     {
 
-        String sql = "UPDATE profiles SET first_name = ?, last_name = ?, phone = ?, email = ?, address = ?, city = ?, state = ?, zip = ? " +
+        int userId = row.getInt("user_id");
 
-                "WHERE user_id = ?";
+        String firstName = row.getString("first_name");
 
+        String lastName = row.getString("last_name");
 
+        String phone = row.getString("phone");
 
-        try (Connection connection = getConnection())
+        String email = row.getString("email");
 
-        {
+        String address = row.getString("address");
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+        String city = row.getString("city");
 
-            ps.setString(1, profile.getFirstName());
+        String state = row.getString("state");
 
-            ps.setString(2, profile.getLastName());
-
-            ps.setString(3, profile.getPhone());
-
-            ps.setString(4, profile.getEmail());
-
-            ps.setString(5, profile.getAddress());
-
-            ps.setString(6, profile.getCity());
-
-            ps.setString(7, profile.getState());
-
-            ps.setString(8, profile.getZip());
-
-            ps.setInt(9, profile.getUserId());
+        String zip = row.getString("zip");
 
 
 
-            ps.executeUpdate();
+        Profile profile = new Profile()
 
-        }
+        {{
 
-        catch (SQLException e)
+            setUserId(userId);
 
-        {
+            setFirstName(firstName);
 
-            throw new RuntimeException(e);
+            setLastName(lastName);
 
-        }
+            setPhone(phone);
 
-    }
+            setEmail(email);
+
+            setAddress(address);
+
+            setCity(city);
+
+            setState(state);
+
+            setZip(zip);
 
 
 
-    // Addtnl method to map the result set to a Profiles object
-
-    private Profile mapRow(ResultSet rs) throws SQLException
-
-    {
-
-        Profile profile = new Profile();
-
-        profile.setUserId(rs.getInt("user_id"));
-
-        profile.setFirstName(rs.getString("first_name"));
-
-        profile.setLastName(rs.getString("last_name"));
-
-        profile.setPhone(rs.getString("phone"));
-
-        profile.setEmail(rs.getString("email"));
-
-        profile.setAddress(rs.getString("address"));
-
-        profile.setCity(rs.getString("city"));
-
-        profile.setState(rs.getString("state"));
-
-        profile.setZip(rs.getString("zip"));
+        }};
 
         return profile;
 

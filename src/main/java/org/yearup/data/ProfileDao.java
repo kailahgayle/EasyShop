@@ -12,14 +12,10 @@ public interface ProfileDao
 
     Profile create(Profile profile);
 
-
-
     // Updates for user profile
 
     Profile getByUserId(int userId); // Method to fetch a profile by user ID
 
-
-
-    void update(Profile profile); // Method to update an existing profile
+    Profile update(Profile profile); // Method to update an existing profile
 
 }
