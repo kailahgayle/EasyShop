@@ -76,7 +76,8 @@ Ensure you have the following installed on your system:
 
 
 ![cap31](https://github.com/user-attachments/assets/8136a5df-22d1-403f-9dcf-c8e11fe07cc1)
-![cap31](https://github.com/user-attachments/assets/86bdaf6a-f97a-4e38-95ef-9a045088e7eb)
+![CAP3](https://github.com/user-attachments/assets/0a2ae03a-942c-484d-959a-45f2582d5702)
+
 
 
 ---
