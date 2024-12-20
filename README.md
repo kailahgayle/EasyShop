@@ -70,8 +70,16 @@ Ensure you have the following installed on your system:
 
 ---
 
-The application will start on http://localhost:8080.
 
+## Project Screenshots
+
+
+
+
+
+---
+
+## Interesting Piece of Code
 
 
 
